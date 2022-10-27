@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1> Hi </h1>
+
+<!--<button onClick="increaseSmoothing()">Increase Smoothing</button>-->
+<!--<button onClick="decreaseSmoothing()">Decrease Smoothing</button>-->
+
+<div id="openseadragon1" style="width: 800px; height: 600px;"></div>
+<!--<script src="../openseadragon/build/openseadragon/openseadragon.min.js"></script>-->
+<script src="openseadragon.min.js"></script>
+<script src="openseadragonzoomlevels.js"></script>
+<script type="text/javascript">
+    var viewer = OpenSeadragon({
+        id: "openseadragon1",
+        tileSources: [
+            "http://192.168.1.68/iipsrv/iipsrv.fcgi?IIIF=image1.tif/info.json"
+        ],
+        showNavigator: true,
+    });
+    var zoomLevels = viewer.zoomLevels({
+        levels: [0, .2, .4, .6, .8, 1]
+    });
+
+    var json_obj = JSON.parse(Get("http://192.168.1.68/iipsrv/iipsrv.fcgi?IIIF=image1.tif/info.json"));
+    const width = json_obj.width;
+    const height = json_obj.height;
+
+    console.log("MAX WIDTH: "+json_obj.width);
+    console.log("MAX HEIGHT: "+json_obj.height);
+
+    // function increaseSmoothing() {
+    //     viewer.viewport.panTo(new OpenSeadragon.Point(0.5, 0.5), true)
+    // }
+    //
+    // function decreaseSmoothing() {
+    //     viewer.viewport.panBy(new OpenSeadragon.Point(0, -.1), false)
+    // }
+
+    const socket = new WebSocket('ws://192.168.1.68:5000/camera');
+    //const socket = new WebSocket('ws://127.0.0.1:5000/coordinates');
+
+    // socket.addEventListener()
+    // socket.send()
+
+    // Listen for messages
+    socket.addEventListener('message', (event) => {
+
+        //console.log(event.data)
+        const msg = JSON.parse(event.data);
+        //
+
+        const scaleX = msg.x;
+        const scaleY = msg.y;
+        const angle = msg.angle;
+
+        const imgX = scaleX * width;
+        const imgY = scaleY * height;
+
+        const inc_coord = new OpenSeadragon.Point(imgX, imgY)
+
+        console.log("X coord " + msg.x)
+        console.log("Y coord " + msg.y)
+
+        var viewportPoint = viewer.viewport.imageToViewportCoordinates(inc_coord);
+
+        console.log(viewportPoint)
+        viewer.viewport.panTo(viewportPoint, true)
+        viewer.viewport.setRotation(angle)
+
+        //viewer.viewport.panTo(new OpenSeadragon.Point(msg.x, msg.y), false)
+
+
+    });
+
+    function Get(yourUrl){
+        var Httpreq = new XMLHttpRequest(); // a new request
+        Httpreq.open("GET",yourUrl,false);
+        Httpreq.send(null);
+        return Httpreq.responseText;
+    }
+
+    // viewer.viewport.setRotation(30)
+</script>
+<!--https://iiif.io/api/image/2/context.json-->
+<!--"http://192.168.1.68/iipsrv/iipsrv.fcgi?IIIF=image1.tif/info.json"-->
+
+</body>
+</html>
+
+
+
+
+
