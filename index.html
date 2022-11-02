@@ -16,10 +16,14 @@
 <script src="openseadragon.min.js"></script>
 <script src="openseadragonzoomlevels.js"></script>
 <script type="text/javascript">
+
+    const HOST_ADDRESS = "129.170.212.19"
+    const HOST_PORT = "5000"
+
     var viewer = OpenSeadragon({
         id: "openseadragon1",
         tileSources: [
-            "http://192.168.1.68/iipsrv/iipsrv.fcgi?IIIF=image1.tif/info.json"
+            `http://${HOST_ADDRESS}/iipsrv/iipsrv.fcgi?IIIF=image1.tif/info.json`
         ],
         showNavigator: true,
     });
@@ -27,7 +31,7 @@
         levels: [0, .2, .4, .6, .8, 1]
     });
 
-    var json_obj = JSON.parse(Get("http://192.168.1.68/iipsrv/iipsrv.fcgi?IIIF=image1.tif/info.json"));
+    var json_obj = JSON.parse(Get(`http://${HOST_ADDRESS}/iipsrv/iipsrv.fcgi?IIIF=image1.tif/info.json`));
     const width = json_obj.width;
     const height = json_obj.height;
 
@@ -42,7 +46,7 @@
     //     viewer.viewport.panBy(new OpenSeadragon.Point(0, -.1), false)
     // }
 
-    const socket = new WebSocket('ws://192.168.1.68:5000/camera');
+    const socket = new WebSocket(`ws://${HOST_ADDRESS}:${HOST_PORT}/camera`);
     //const socket = new WebSocket('ws://127.0.0.1:5000/coordinates');
 
     // socket.addEventListener()
